@@ -765,7 +765,6 @@ MAIL_FROM_ADDRESS=noreply@yourdomain.com
 
 ### 8.2 Fázis 3 (Medium-term)
 - [ ] Mobile application (React Native / Flutter)
-- [ ] Voice-based helpdesk (bónusz pont a feladatban)
 - [ ] Calendar integration (Google Calendar, Outlook)
 - [ ] Analytics dashboard for agents
 - [ ] Multi-language support (i18n)
@@ -779,7 +778,19 @@ MAIL_FROM_ADDRESS=noreply@yourdomain.com
 
 ---
 
-## 9. Konklúzió
+## 9. Belépési adatok teszteléshez 🔑
+
+**Ügyfél (Regular User):**
+- Email: `test@example.com`
+- Jelszó: `password`
+
+**Ügyfélszolgálati munkatárs (Agent):**
+- Email: `agent@example.com`
+- Jelszó: `password`
+
+---
+
+## 10. Konklúzió
 
 A megvalósított rendszer teljesíti az összes funkcionális és nem-funkcionális követelményt:
 
@@ -789,7 +800,8 @@ A megvalósított rendszer teljesíti az összes funkcionális és nem-funkcion�
 - Password Reset
 - MFA (Google Authenticator)
 
-✅ **Haladó funkciók:**
+✅ **Haladó és Bónusz funkciók:**
+- **Web Voice Support (Bónusz)**: Beszédfelismerés és felolvasás
 - AI-powered Helpdesk
 - Agent Interface
 - OWASP Top 10 védelem
