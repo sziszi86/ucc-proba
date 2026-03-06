@@ -21,18 +21,29 @@ onMounted(async () => {
 
 // Setup Web Speech API for Recognition
 function setupSpeechRecognition() {
+  const isSecure = window.isSecureContext
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+  
+  if (!isSecure && window.location.hostname !== 'localhost') {
+    console.error('Speech Recognition requires a secure context (HTTPS or localhost).')
+    return
+  }
+
   if (SpeechRecognition) {
     recognition.value = new SpeechRecognition()
     recognition.value.continuous = false
     recognition.value.interimResults = false
-    recognition.value.lang = 'hu-HU' // Beállítva magyar nyelvre
+    recognition.value.lang = 'hu-HU'
+
+    recognition.value.onstart = () => {
+      isListening.value = true
+      error.value = ''
+    }
 
     recognition.value.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript
       newMessage.value = transcript
       isListening.value = false
-      // Automatically send if in voice mode
       if (isVoiceMode.value) {
         sendMessage()
       }
@@ -43,40 +54,45 @@ function setupSpeechRecognition() {
       isListening.value = false
       
       if (event.error === 'not-allowed') {
-        error.value = 'Mikrofon hozzáférés megtagadva. Kérlek, engedélyezd a böngészőben!'
-      } else if (event.error === 'no-speech') {
-        // Csend volt, nem csinálunk semmit, csak leállítjuk az animációt
-      } else {
-        error.value = 'Hiba történt a hangfelismerés során: ' + event.error
+        error.value = 'Hiba: A mikrofon használata nincs engedélyezve. Kattints a lakat ikonra a címsorban az engedélyezéshez!'
+      } else if (event.error === 'service-not-allowed') {
+        error.value = 'Hiba: A hangfelismerő szolgáltatás nem érhető el (pl. hálózati hiba vagy SSL hiánya).'
+      } else if (event.error !== 'no-speech') {
+        error.value = 'Hangfelismerési hiba: ' + event.error
       }
     }
 
     recognition.value.onend = () => {
       isListening.value = false
     }
-  } else {
-    console.warn('Speech Recognition API not supported in this browser.')
   }
 }
 
 function toggleListening() {
+  const isSecure = window.isSecureContext
+  
+  if (!isSecure && window.location.hostname !== 'localhost') {
+    alert('A hangfelismerés csak biztonságos kapcsolaton (HTTPS) vagy localhost-on keresztül működik a böngésző szabályai miatt.')
+    return
+  }
+
   if (!recognition.value) {
-    alert('A böngésződ nem támogatja a hangfelismerést. Kérlek, használj Chrome-ot vagy Edge-et!')
+    alert('A böngésződ nem támogatja a hangfelismerést, vagy a funkció le van tiltva. Kérlek, használj Chrome-ot!')
     return
   }
   
-  error.value = '' // Töröljük az előző hibákat
-  
   if (isListening.value) {
-    recognition.value?.stop()
-    isListening.value = false
+    try {
+      recognition.value.stop()
+    } catch (e) {
+      isListening.value = false
+    }
   } else {
     try {
-      recognition.value?.start()
-      isListening.value = true
+      recognition.value.start()
     } catch (e) {
-      console.error('Failed to start recognition', e)
-      isListening.value = false
+      console.error('Recognition start error:', e)
+      error.value = 'Nem sikerült elindítani a mikrofont. Ellenőrizd a böngésző beállításait!'
     }
   }
 }
