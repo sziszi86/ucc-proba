@@ -156,6 +156,31 @@ async function handleLogout() {
       <main class="flex-1 p-6 lg:p-10 max-w-(--breakpoint-2xl) w-full mx-auto">
         <slot></slot>
       </main>
+
+      <!-- Next Gen Footer -->
+      <footer class="px-10 py-8 border-t border-slate-200/50 bg-white/30 backdrop-blur-sm">
+        <div class="max-w-(--breakpoint-2xl) mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="flex items-center space-x-2 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500">
+            <div class="bg-slate-900 p-1 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span class="text-xs font-black tracking-tight uppercase">UCC System</span>
+          </div>
+          
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+            &copy; 2026 Crafted with Passion
+          </div>
+
+          <div class="flex items-center space-x-1 text-xs font-bold text-slate-500">
+            <span>Developed by</span>
+            <a href="https://salamonszilard.hu" target="_blank" class="text-indigo-600 hover:text-indigo-500 transition-colors px-2 py-1 bg-indigo-50 rounded-lg border border-indigo-100 hover:border-indigo-300">
+              salamonszilard.hu
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   </div>
 </template>
