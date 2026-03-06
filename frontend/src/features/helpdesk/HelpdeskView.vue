@@ -26,7 +26,7 @@ function setupSpeechRecognition() {
     recognition.value = new SpeechRecognition()
     recognition.value.continuous = false
     recognition.value.interimResults = false
-    recognition.value.lang = 'en-US' // Default to English
+    recognition.value.lang = 'hu-HU' // Beállítva magyar nyelvre
 
     recognition.value.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript
@@ -41,21 +41,43 @@ function setupSpeechRecognition() {
     recognition.value.onerror = (event: any) => {
       console.error('Speech recognition error', event.error)
       isListening.value = false
+      
+      if (event.error === 'not-allowed') {
+        error.value = 'Mikrofon hozzáférés megtagadva. Kérlek, engedélyezd a böngészőben!'
+      } else if (event.error === 'no-speech') {
+        // Csend volt, nem csinálunk semmit, csak leállítjuk az animációt
+      } else {
+        error.value = 'Hiba történt a hangfelismerés során: ' + event.error
+      }
     }
 
     recognition.value.onend = () => {
       isListening.value = false
     }
+  } else {
+    console.warn('Speech Recognition API not supported in this browser.')
   }
 }
 
 function toggleListening() {
+  if (!recognition.value) {
+    alert('A böngésződ nem támogatja a hangfelismerést. Kérlek, használj Chrome-ot vagy Edge-et!')
+    return
+  }
+  
+  error.value = '' // Töröljük az előző hibákat
+  
   if (isListening.value) {
     recognition.value?.stop()
     isListening.value = false
   } else {
-    recognition.value?.start()
-    isListening.value = true
+    try {
+      recognition.value?.start()
+      isListening.value = true
+    } catch (e) {
+      console.error('Failed to start recognition', e)
+      isListening.value = false
+    }
   }
 }
 
@@ -67,7 +89,7 @@ function speak(text: string) {
   window.speechSynthesis.cancel()
   
   const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = 'en-US'
+  utterance.lang = 'hu-HU' // Felolvasás is magyarul
   utterance.rate = 1.0
   window.speechSynthesis.speak(utterance)
 }
