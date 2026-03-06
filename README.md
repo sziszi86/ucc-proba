@@ -7,11 +7,12 @@ Event management system with AI-powered helpdesk functionality.
 - Event management (Create, Read, Update, Delete)
 - JWT Authentication with MFA support
 - Password reset functionality
-- AI-powered helpdesk chatbot
+- **Smart Hybrid Helpdesk Chatbot** (Works offline with smart keyword matching + optional Gemini AI integration)
 - Helpdesk agent interface
+- Web Voice Support (Speech-to-Text & Text-to-Speech)
 - OWASP Top 10 security implementation
 - RESTful API
-- Modern Vue.js 3 frontend
+- Modern Vue.js 3 frontend (Tailwind CSS v4)
 
 ## Tech Stack
 

@@ -10,7 +10,7 @@
 - ✅ **EventController** - CRUD műveletek eseményekhez
 - ✅ **ChatController** - User chat interface AI támogatással
 - ✅ **HelpdeskController** - Agent interface chat kezeléshez
-- ✅ **ChatAIService** - AI válaszgenerálás szabadszavas kérdésekhez
+- ✅ **ChatAIService** - **Okos Hibrid AI**: Kulcsszó alapú intelligens válaszok (API kulcs nélkül) + Opcionális Google Gemini 1.5 Flash integráció
 - ✅ **SecurityHeaders Middleware** - OWASP Top 10 védelem
 - ✅ **Modellek** - User, Event, Chat, ChatMessage teljes relációkkal
 - ✅ **Migrációk** - Adatbázis struktúra telepítve és tesztelve

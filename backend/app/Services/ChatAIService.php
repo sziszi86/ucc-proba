@@ -17,90 +17,82 @@ class ChatAIService
 
     public function generateResponse(string $message, array $context = []): string
     {
-        $lowerMessage = strtolower($message);
+        $message = strtolower(trim($message));
 
-        // Pre-processing: If user wants a human, we still handle it locally for speed
+        // 1. Ügynök kérés kezelése (Prioritás)
         if ($this->shouldTransferToHuman($message)) {
-            return "I'll connect you with a human agent shortly. Please hold on.";
+            return "I understand you'd like to speak with a human. I'm connecting you to one of our agents right now. Please wait a moment.";
         }
 
-        // If API key is not set, use the old keyword-based fallback
-        if (!$this->apiKey) {
-            return $this->getFallbackResponse($message);
-        }
+        // 2. Ha van API kulcs, használjuk a valódi AI-t
+        if ($this->apiKey && !str_contains($this->apiKey, 'YOUR_')) {
+            try {
+                $systemPrompt = "You are a helpful support assistant for UCC Event System. Features: Events (CRUD), MFA (Google Auth), Login. Keep it 1-2 sentences.";
+                $response = Http::timeout(5)->post($this->baseUrl . '?key=' . $this->apiKey, [
+                    'contents' => [['parts' => [['text' => $systemPrompt . "\n\nUser: " . $message]]]]
+                ]);
 
-        try {
-            $systemPrompt = "You are a helpful support assistant for the 'UCC Event Management & Helpdesk System'. 
-            The system has these features:
-            1. Event Management: Users can create, list, update descriptions, and delete events.
-            2. Security: We use JWT and Multi-Factor Authentication (Google Authenticator).
-            3. Helpdesk: Users can chat with you (AI) or request a human agent.
-            
-            Guidelines:
-            - Be concise and professional.
-            - If the user asks how to do something, explain it based on the features above.
-            - If the user wants to speak to a person, tell them you are connecting them.
-            - Keep answers short (max 2-3 sentences).";
-
-            $response = Http::post($this->baseUrl . '?key=' . $this->apiKey, [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $systemPrompt . "\n\nUser: " . $message]
-                        ]
-                    ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.7,
-                    'maxOutputTokens' => 200,
-                ]
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                return $data['candidates'][0]['content']['parts'][0]['text'] ?? $this->getFallbackResponse($message);
+                if ($response->successful()) {
+                    $data = $response->json();
+                    return $data['candidates'][0]['content']['parts'][0]['text'] ?? $this->getSmartFallback($message);
+                }
+            } catch (\Exception $e) {
+                // Hiba esetén megyünk tovább a fallback-re
             }
-
-            Log::error('Gemini API error: ' . $response->body());
-            return $this->getFallbackResponse($message);
-
-        } catch (\Exception $e) {
-            Log::error('ChatAIService exception: ' . $e->getMessage());
-            return $this->getFallbackResponse($message);
         }
+
+        // 3. Okos Hibrid Fallback (API kulcs nélkül is működik)
+        return $this->getSmartFallback($message);
     }
 
     public function shouldTransferToHuman(string $message): bool
     {
-        $lowerMessage = strtolower($message);
-
-        return str_contains($lowerMessage, 'human')
-            || str_contains($lowerMessage, 'agent')
-            || str_contains($lowerMessage, 'person')
-            || str_contains($lowerMessage, 'speak to someone')
-            || str_contains($lowerMessage, 'operator');
+        $msg = strtolower($message);
+        $keywords = ['human', 'agent', 'person', 'speak to', 'operator', 'representative', 'help from a real', 'staff'];
+        foreach ($keywords as $keyword) {
+            if (str_contains($msg, $keyword)) return true;
+        }
+        return false;
     }
 
-    protected function getFallbackResponse(string $message): string
+    protected function getSmartFallback(string $msg): string
     {
-        $lowerMessage = strtolower($message);
-
-        if (str_contains($lowerMessage, 'event') && (str_contains($lowerMessage, 'create') || str_contains($lowerMessage, 'add'))) {
-            return "To create an event, navigate to the Events section and click the 'Add Event' button. You'll need to provide a title, date & time, and optionally a description.";
+        // Üdvözlés
+        if (preg_match('/(hi|hello|hey|greetings)/', $msg)) {
+            return "Hello! I'm your UCC AI assistant. How can I help you with your events or account settings today?";
         }
 
-        if (str_contains($lowerMessage, 'event') && (str_contains($lowerMessage, 'update') || str_contains($lowerMessage, 'edit'))) {
-            return "To update an event, go to your Events list, find the event you want to modify, and click the edit icon. You can change the description, title, or date.";
+        // Esemény létrehozás
+        if (str_contains($msg, 'event') && (str_contains($msg, 'create') || str_contains($msg, 'add') || str_contains($msg, 'new'))) {
+            return "To create a new event, just click the 'New Event' button on the Events page. You'll need a title and a date.";
         }
 
-        if (str_contains($lowerMessage, 'password') && str_contains($lowerMessage, 'reset')) {
-            return "To reset your password, click on 'Forgot Password' on the login page. Enter your email address and you'll receive a password reset link.";
+        // Esemény módosítás/törlés
+        if (str_contains($msg, 'event') && (str_contains($msg, 'edit') || str_contains($msg, 'update') || str_contains($msg, 'delete') || str_contains($msg, 'change'))) {
+            return "You can manage your events by clicking the icons on each event card. You can update the description or remove events permanently.";
         }
 
-        if (str_contains($lowerMessage, 'mfa') || str_contains($lowerMessage, '2fa')) {
-            return "To enable Multi-Factor Authentication (MFA), go to Settings and click 'Setup MFA'. You'll need to scan a QR code with an authenticator app.";
+        // MFA / Biztonság
+        if (str_contains($msg, 'mfa') || str_contains($msg, '2fa') || str_contains($msg, 'security') || str_contains($msg, 'protect')) {
+            return "For extra security, you can enable Multi-Factor Authentication in your Settings. We support Google Authenticator.";
         }
 
-        return "I'm an AI assistant here to help you. I can answer questions about events, account settings, and more. If you need specific assistance, please let me know, or I can connect you with a human agent.";
+        // Jelszó
+        if (str_contains($msg, 'password') || str_contains($msg, 'login') || str_contains($msg, 'account')) {
+            return "You can manage your account details in the Settings page. If you forgot your password, use the reset link on the login screen.";
+        }
+
+        // Köszönet
+        if (preg_match('/(thanks|thank you|cool|great|awesome)/', $msg)) {
+            return "You're very welcome! Is there anything else I can help you with?";
+        }
+
+        // Ha semmit nem ismer fel, de "hogyan" kérdés
+        if (str_contains($msg, 'how') || str_contains($msg, 'help') || str_contains($msg, 'can you')) {
+            return "I can help you manage your events, setup MFA security, or connect you to a human agent. What would you like to do?";
+        }
+
+        // Végső válasz (kicsit barátságosabb)
+        return "I'm not sure I quite followed that. Could you please clarify if you're asking about events, security, or if you'd like me to find a human agent for you?";
     }
 }

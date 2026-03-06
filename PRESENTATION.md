@@ -53,15 +53,18 @@ A projekt során három fő architektúrát mérlegeltünk:
   - Iparági standard
   - Felhasználóbarát QR kód beállítás
 
-### 1.5 AI Chat megközelítés
-**Lehetőségek:**
-- **Rule-based chatbot**: Egyszerű, korlátozott válaszok
-- **External AI API (OpenAI GPT)**: Költséges, függőség külső szolgáltatástól
-- **Hybrid megoldás (Választott)**:
-  - Rule-based intelligens válaszgenerálás kulcsszavak alapján
-  - Könnyen bővíthető külső AI API-val
-  - Költséghatékony
-  - Emberi átvétel támogatása
+### 1.5 AI Chat megközelítés (Smart Hybrid)
+A projekt egy egyedi hibrid megoldást használ a megbízhatóság és a privát szféra védelme érdekében:
+
+**Működési elv:**
+1.  **Helyi intelligencia (Offline/Default):** Egy kiterjesztett kulcsszó- és környezetfüggő algoritmus, amely azonnal válaszol a leggyakoribb kérdésekre (eseménykezelés, MFA, login) API hívás nélkül. Ez garantálja, hogy a rendszer mindig működőképes és "okos" marad, külső kulcsok nélkül is.
+2.  **LLM Integráció (Opcionális):** Ha a `.env` fájlban be van állítva a `GEMINI_API_KEY`, a rendszer automatikusan a Google Gemini 1.5 Flash modellt használja a komplexebb kérdések megválaszolására.
+3.  **Human Escalation:** Mindkét módban a rendszer figyeli az ügynöki kéréseket, és szükség esetén automatikusan átadja a chatet egy emberi operátornak.
+
+**Előnyök:**
+- **Adatbiztonság:** Nem kötelező külső félnek adatot küldeni.
+- **Költséghatékonyság:** Az alapműködés ingyenes.
+- **Reliability:** Nincs külső függőség az alapfunkciókhoz.
 
 ---
 
