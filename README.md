@@ -290,10 +290,3 @@ npm run test
 - **Presentation**: `PRESENTATION.md` - Detailed project documentation
 - **API Docs**: `backend/storage/api-docs/api-docs.yaml` - OpenAPI specification
 
-## License
-
-This project is developed for UCC evaluation purposes.
-
-## Contact
-
-For questions or support, contact: info@unitedcallcenters.hu
