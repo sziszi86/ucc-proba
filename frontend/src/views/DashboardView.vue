@@ -9,6 +9,7 @@ const authStore = useAuthStore()
 const eventCount = ref(0)
 const chatCount = ref(0)
 const loading = ref(true)
+const showSecurityTip = ref(true)
 
 onMounted(async () => {
   try {
@@ -115,14 +116,19 @@ const recentActivity = computed(() => {
     </div>
 
     <!-- Security Tip Banner -->
-    <div v-if="!authStore.user?.mfa_enabled" class="animate-in mb-10 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between shadow-sm">
+    <div v-if="!authStore.user?.mfa_enabled && showSecurityTip" class="animate-in mb-10 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between shadow-sm relative group">
+      <button @click="showSecurityTip = false" class="absolute top-4 right-4 p-1 text-amber-400 hover:text-amber-600 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
       <div class="flex items-center mb-4 md:mb-0">
         <div class="p-3 bg-amber-500 text-white rounded-2xl mr-4 shadow-lg shadow-amber-500/20">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <div>
+        <div class="pr-8">
           <h4 class="text-slate-900 font-bold">Boost your Security Score to 100%!</h4>
           <p class="text-slate-600 text-sm">Your current score is 65%. Enable Multi-Factor Authentication to fully protect your account.</p>
         </div>
