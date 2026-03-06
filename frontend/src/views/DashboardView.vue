@@ -86,9 +86,12 @@ const authStore = useAuthStore()
         <div class="space-y-4">
           <div class="flex justify-between items-center py-2 border-b border-slate-50">
             <span class="text-slate-600">MFA Protection</span>
-            <span :class="[authStore.user?.mfa_enabled ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50', 'px-2 py-1 rounded text-xs font-bold uppercase tracking-wider']">
-              {{ authStore.user?.mfa_enabled ? 'Enabled' : 'Disabled' }}
-            </span>
+            <div class="flex items-center gap-2">
+              <span :class="[authStore.user?.mfa_enabled ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50', 'px-2 py-1 rounded text-xs font-bold uppercase tracking-wider border border-current opacity-70']">
+                {{ authStore.user?.mfa_enabled ? 'Enabled' : 'Disabled' }}
+              </span>
+              <router-link to="/settings" class="text-xs text-indigo-600 hover:underline font-bold">Manage</router-link>
+            </div>
           </div>
           <div class="flex justify-between items-center py-2 border-b border-slate-50">
             <span class="text-slate-600">Access Level</span>

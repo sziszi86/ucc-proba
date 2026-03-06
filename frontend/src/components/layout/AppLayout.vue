@@ -18,6 +18,7 @@ const navigation = computed(() => [
     active: route.path === '/helpdesk-agent',
     show: authStore.isHelpdeskAgent 
   },
+  { name: 'Settings', href: '/settings', icon: 'settings', active: route.path === '/settings' },
 ])
 
 async function handleLogout() {

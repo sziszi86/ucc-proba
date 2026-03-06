@@ -45,6 +45,12 @@ const router = createRouter({
       name: 'helpdesk-agent',
       component: () => import('../features/helpdesk-agent/HelpdeskAgentView.vue'),
       meta: { requiresAuth: true, requiresAgent: true }
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('../views/SettingsView.vue'),
+      meta: { requiresAuth: true }
     }
   ]
 })
