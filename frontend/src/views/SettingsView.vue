@@ -209,8 +209,8 @@ function cancelSetup() {
                 v-model="mfaCode" 
                 type="text" 
                 maxlength="6" 
-                placeholder="000 000" 
-                class="input-field text-center text-2xl font-mono tracking-[0.5em] w-full max-w-[200px]"
+                placeholder="000000" 
+                class="input-field text-center text-2xl font-mono tracking-[0.25em] w-full max-w-[240px]"
               >
               <div class="flex gap-2 w-full sm:w-auto">
                 <button @click="confirmMfa" :disabled="loading || mfaCode.length !== 6" class="btn btn-primary flex-1">

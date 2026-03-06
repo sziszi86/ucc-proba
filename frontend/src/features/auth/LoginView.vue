@@ -174,8 +174,8 @@ function cancelMfa() {
               type="text"
               required
               maxlength="6"
-              placeholder="000 000"
-              class="input-field text-center text-2xl tracking-[0.5em] font-mono"
+              placeholder="000000"
+              class="input-field text-center text-2xl tracking-[0.25em] font-mono w-full max-w-[240px] mx-auto"
             />
           </div>
 
