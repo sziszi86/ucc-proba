@@ -1,20 +1,69 @@
 <script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { eventService } from '@/services/eventService'
+import { chatService } from '@/services/chatService'
 import AppLayout from '@/components/layout/AppLayout.vue'
 
 const authStore = useAuthStore()
+const eventCount = ref(0)
+const chatCount = ref(0)
+const loading = ref(true)
 
-const stats = [
-  { name: 'Active Events', value: '12', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-  { name: 'Helpdesk Tickets', value: '3', icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { name: 'Security Score', value: '98%', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', color: 'text-amber-600', bg: 'bg-amber-50' },
-]
+onMounted(async () => {
+  try {
+    const [events, chats] = await Promise.all([
+      eventService.getAll(),
+      chatService.getAll()
+    ])
+    eventCount.value = events.length
+    chatCount.value = chats.length
+  } catch (err) {
+    console.error('Failed to fetch dashboard stats:', err)
+  } finally {
+    loading.value = false
+  }
+})
 
-const recentActivity = [
-  { id: 1, type: 'event', text: 'New event "Project Sync" created', time: '2 hours ago', icon: 'plus' },
-  { id: 2, type: 'security', text: 'MFA settings updated', time: 'Yesterday', icon: 'shield' },
-  { id: 3, type: 'helpdesk', text: 'Ticket #142 closed by AI', time: '2 days ago', icon: 'check' },
-]
+const stats = computed(() => [
+  { 
+    name: 'Active Events', 
+    value: loading.value ? '...' : eventCount.value.toString(), 
+    icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 
+    color: 'text-indigo-600', 
+    bg: 'bg-indigo-50' 
+  },
+  { 
+    name: 'Support Tickets', 
+    value: loading.value ? '...' : chatCount.value.toString(), 
+    icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z', 
+    color: 'text-emerald-600', 
+    bg: 'bg-emerald-50' 
+  },
+  { 
+    name: 'Security Score', 
+    value: authStore.user?.mfa_enabled ? '100%' : '65%', 
+    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', 
+    color: 'text-amber-600', 
+    bg: 'bg-amber-50' 
+  },
+])
+
+const recentActivity = computed(() => {
+  const activities = []
+  if (eventCount.value > 0) {
+    activities.push({ id: 1, type: 'event', text: `You have ${eventCount.value} total events scheduled`, time: 'Updated now', icon: 'calendar' })
+  }
+  if (authStore.user?.mfa_enabled) {
+    activities.push({ id: 2, type: 'security', text: 'MFA protection is active', time: 'Ongoing', icon: 'shield' })
+  } else {
+    activities.push({ id: 2, type: 'security', text: 'Improve security: Enable MFA', time: 'Recommended', icon: 'alert' })
+  }
+  if (chatCount.value > 0) {
+    activities.push({ id: 3, type: 'helpdesk', text: `${chatCount.value} helpdesk conversations`, time: 'History', icon: 'chat' })
+  }
+  return activities
+})
 </script>
 
 <template>
@@ -26,14 +75,14 @@ const recentActivity = [
           Welcome back, <span class="text-indigo-400">{{ authStore.user?.name.split(' ')[0] }}</span>!
         </h1>
         <p class="mt-4 text-slate-400 max-w-xl text-lg font-medium leading-relaxed">
-          Everything is running smoothly. You have <span class="text-white font-bold">3 active tickets</span> and your next event starts in <span class="text-white font-bold">2 hours</span>.
+          Everything is running smoothly. You have <span class="text-white font-bold">{{ chatCount }} tickets</span> and <span class="text-white font-bold">{{ eventCount }} events</span> in your system.
         </p>
         <div class="mt-8 flex flex-wrap gap-4">
           <router-link to="/events" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
-            Create Event
+            Manage Events
           </router-link>
           <router-link to="/helpdesk" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-xl font-bold transition-all backdrop-blur-md active:scale-95">
-            Open Helpdesk
+            Support Chat
           </router-link>
         </div>
       </div>
@@ -55,11 +104,11 @@ const recentActivity = [
         </div>
         <div class="mt-4">
           <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">{{ stat.name }}</h3>
-          <div class="mt-1 flex items-center text-xs font-bold text-emerald-500">
+          <div v-if="!loading" class="mt-1 flex items-center text-xs font-bold text-emerald-500">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
             </svg>
-            +12% from last month
+            Live Data
           </div>
         </div>
       </div>
@@ -69,10 +118,13 @@ const recentActivity = [
       <!-- Activity Feed -->
       <div class="lg:col-span-2 card p-8">
         <div class="flex items-center justify-between mb-8">
-          <h3 class="text-xl font-black text-slate-900 tracking-tight">Recent Activity</h3>
-          <button class="text-xs font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest">View History</button>
+          <h3 class="text-xl font-black text-slate-900 tracking-tight">System Status</h3>
+          <button class="text-xs font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest">Refresh</button>
         </div>
         <div class="space-y-8">
+          <div v-if="recentActivity.length === 0" class="text-center py-10 text-slate-400 font-medium italic">
+            No activity recorded yet.
+          </div>
           <div v-for="item in recentActivity" :key="item.id" class="relative flex items-start group">
             <div class="absolute left-4 top-10 bottom-[-32px] w-0.5 bg-slate-100 last:hidden"></div>
             <div class="flex-shrink-0 h-9 w-9 rounded-full bg-slate-50 border-2 border-white shadow-sm flex items-center justify-center z-10 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
