@@ -7,6 +7,7 @@ const chats = ref<Chat[]>([])
 const selectedChat = ref<Chat | null>(null)
 const newMessage = ref('')
 const loading = ref(false)
+const error = ref('')
 const chatContainer = ref<HTMLElement | null>(null)
 
 // Voice Support State
@@ -25,74 +26,86 @@ function setupSpeechRecognition() {
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
   
   if (!isSecure && window.location.hostname !== 'localhost') {
-    console.error('Speech Recognition requires a secure context (HTTPS or localhost).')
+    console.error('Speech Recognition requires a secure context.')
     return
   }
 
   if (SpeechRecognition) {
     recognition.value = new SpeechRecognition()
-    recognition.value.continuous = false
-    recognition.value.interimResults = false
-    recognition.value.lang = 'hu-HU'
+    recognition.value.continuous = true // Folyamatos figyelés
+    recognition.value.interimResults = true // Részeredmények mutatása
+    recognition.value.lang = 'en-US'
 
     recognition.value.onstart = () => {
+      console.log('Speech recognition started')
       isListening.value = true
       error.value = ''
     }
 
     recognition.value.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript
-      newMessage.value = transcript
-      isListening.value = false
-      if (isVoiceMode.value) {
-        sendMessage()
+      let interimTranscript = ''
+      let finalTranscript = ''
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript
+        } else {
+          interimTranscript += event.results[i][0].transcript
+        }
       }
+
+      // If we have final text, append it, if only interim, show it too
+      if (finalTranscript) {
+        newMessage.value = (newMessage.value + ' ' + finalTranscript).trim()
+      } else if (interimTranscript) {
+        // Temporarily put it in the field so the user sees we're listening
+        const baseText = newMessage.value.split('...')[0]
+        newMessage.value = baseText + (baseText ? ' ' : '') + interimTranscript
+      }
+    }
+
+    recognition.value.onspeechend = () => {
+      console.log('Speech ended')
     }
 
     recognition.value.onerror = (event: any) => {
       console.error('Speech recognition error', event.error)
-      isListening.value = false
+      if (event.error === 'no-speech') return
       
+      isListening.value = false
       if (event.error === 'not-allowed') {
-        error.value = 'Hiba: A mikrofon használata nincs engedélyezve. Kattints a lakat ikonra a címsorban az engedélyezéshez!'
-      } else if (event.error === 'service-not-allowed') {
-        error.value = 'Hiba: A hangfelismerő szolgáltatás nem érhető el (pl. hálózati hiba vagy SSL hiánya).'
-      } else if (event.error !== 'no-speech') {
-        error.value = 'Hangfelismerési hiba: ' + event.error
+        error.value = 'Error: Microphone access denied.'
+      } else {
+        error.value = 'Error: ' + event.error
       }
     }
 
     recognition.value.onend = () => {
+      console.log('Speech recognition ended')
       isListening.value = false
     }
   }
 }
 
 function toggleListening() {
-  const isSecure = window.isSecureContext
-  
-  if (!isSecure && window.location.hostname !== 'localhost') {
-    alert('A hangfelismerés csak biztonságos kapcsolaton (HTTPS) vagy localhost-on keresztül működik a böngésző szabályai miatt.')
-    return
+  if (!recognition.value) {
+    setupSpeechRecognition()
   }
 
   if (!recognition.value) {
-    alert('A böngésződ nem támogatja a hangfelismerést, vagy a funkció le van tiltva. Kérlek, használj Chrome-ot!')
+    alert('Your browser does not support speech recognition.')
     return
   }
   
   if (isListening.value) {
-    try {
-      recognition.value.stop()
-    } catch (e) {
-      isListening.value = false
-    }
+    recognition.value.stop()
   } else {
     try {
+      if (newMessage.value === '') error.value = ''
       recognition.value.start()
     } catch (e) {
       console.error('Recognition start error:', e)
-      error.value = 'Nem sikerült elindítani a mikrofont. Ellenőrizd a böngésző beállításait!'
+      isListening.value = false
     }
   }
 }
@@ -105,7 +118,7 @@ function speak(text: string) {
   window.speechSynthesis.cancel()
   
   const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = 'hu-HU' // Felolvasás is magyarul
+  utterance.lang = 'en-US'
   utterance.rate = 1.0
   window.speechSynthesis.speak(utterance)
 }
