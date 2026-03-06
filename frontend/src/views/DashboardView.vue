@@ -114,6 +114,24 @@ const recentActivity = computed(() => {
       </div>
     </div>
 
+    <!-- Security Tip Banner -->
+    <div v-if="!authStore.user?.mfa_enabled" class="animate-in mb-10 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between shadow-sm">
+      <div class="flex items-center mb-4 md:mb-0">
+        <div class="p-3 bg-amber-500 text-white rounded-2xl mr-4 shadow-lg shadow-amber-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-slate-900 font-bold">Boost your Security Score to 100%!</h4>
+          <p class="text-slate-600 text-sm">Your current score is 65%. Enable Multi-Factor Authentication to fully protect your account.</p>
+        </div>
+      </div>
+      <router-link to="/settings" class="btn bg-slate-900 text-white hover:bg-slate-800 px-8">
+        Enable MFA Now
+      </router-link>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Activity Feed -->
       <div class="lg:col-span-2 card p-8">
