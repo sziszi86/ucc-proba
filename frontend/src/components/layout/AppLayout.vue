@@ -29,33 +29,31 @@ async function handleLogout() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#f8fafc] flex">
+  <div class="min-h-screen bg-[#fdfbf7] flex font-sans">
     <!-- Sidebar Desktop -->
-    <aside class="hidden lg:flex flex-col w-72 bg-slate-900 text-white fixed h-full z-20 transition-all duration-300">
+    <aside class="hidden lg:flex flex-col w-72 bg-[#1a1a1a] text-[#fdfbf7] fixed h-full z-20 transition-all duration-300 border-r-4 border-[#c9171e]">
       <div class="p-8">
         <div class="flex items-center space-x-3 group cursor-pointer">
-          <div class="bg-indigo-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+          <div class="bg-[#c9171e] w-8 h-8 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span class="w-2 h-2 bg-white rounded-full"></span>
           </div>
-          <span class="text-xl font-black tracking-tight italic">UCC <span class="text-indigo-400 not-italic">PROBA</span></span>
+          <span class="text-xl font-black tracking-[0.2em] uppercase">UCC <span class="text-slate-500">System</span></span>
         </div>
       </div>
 
-      <nav class="flex-1 px-4 space-y-2 mt-4">
+      <nav class="flex-1 px-6 space-y-4 mt-8">
         <template v-for="item in navigation" :key="item.name">
           <router-link
             v-if="item.show !== false"
             :to="item.href"
             :class="[
               item.active
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'text-slate-400 hover:bg-slate-800 hover:text-white',
-              'flex items-center px-4 py-3 rounded-xl text-sm font-bold transition-all group'
+                ? 'text-[#c9171e] border-l-2 border-[#c9171e] pl-4 translate-x-2'
+                : 'text-slate-400 hover:text-[#fdfbf7] hover:pl-2',
+              'flex items-center py-2 text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 group'
             ]"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 transition-colors" :class="item.active ? 'text-white' : 'text-slate-500 group-hover:text-white'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-4 transition-colors" :class="item.active ? 'text-[#c9171e]' : 'text-slate-500 group-hover:text-white'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
             </svg>
             {{ item.name }}
@@ -63,25 +61,25 @@ async function handleLogout() {
         </template>
       </nav>
 
-      <div class="p-4 mt-auto">
-        <div class="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50">
-          <div class="flex items-center mb-4">
-            <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-white shadow-inner">
+      <div class="p-6 mt-auto">
+        <div class="bg-[#111111] p-4 border border-slate-800">
+          <div class="flex items-center mb-6">
+            <div class="h-10 w-10 bg-[#fdfbf7] text-[#1a1a1a] flex items-center justify-center font-black text-lg">
               {{ authStore.user?.name.charAt(0) }}
             </div>
-            <div class="ml-3 overflow-hidden">
-              <p class="text-sm font-bold truncate">{{ authStore.user?.name }}</p>
-              <p class="text-[10px] text-slate-500 font-medium truncate uppercase tracking-widest">{{ authStore.user?.role || 'User' }}</p>
+            <div class="ml-4 overflow-hidden">
+              <p class="text-sm font-bold truncate text-[#fdfbf7]">{{ authStore.user?.name }}</p>
+              <p class="text-[10px] text-[#c9171e] font-black truncate uppercase tracking-widest">{{ authStore.user?.role || 'User' }}</p>
             </div>
           </div>
           <button
             @click="handleLogout"
-            class="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-slate-700 hover:bg-rose-600 transition-colors text-xs font-bold"
+            class="w-full flex items-center justify-center space-x-2 py-3 border border-slate-700 hover:border-[#c9171e] hover:bg-[#c9171e] hover:text-white transition-all text-xs font-black tracking-widest uppercase"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span>Logout</span>
+            <span>Logout (退出)</span>
           </button>
         </div>
       </div>
