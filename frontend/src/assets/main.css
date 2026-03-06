@@ -1,35 +1,38 @@
-@import './base.css';
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900;
+  }
+}
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+  @apply min-h-screen;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
+/* Custom styles can go here */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition duration-200 ease-in-out;
   }
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+  .btn-primary {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-95 cursor-pointer;
+  }
+
+  .btn-danger {
+    @apply bg-rose-600 text-white hover:bg-rose-700 active:scale-95 cursor-pointer;
+  }
+
+  .input-field {
+    @apply mt-1 block w-full px-4 py-2 bg-white border border-slate-200 rounded-lg shadow-sm outline-hidden ring-indigo-500 focus:ring-2 focus:border-transparent text-slate-900 transition;
+  }
+
+  .card {
+    @apply bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden;
   }
 }
