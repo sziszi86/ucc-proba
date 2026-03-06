@@ -1,0 +1,518 @@
+openapi: 3.0.0
+info:
+  title: Event Management & Helpdesk API
+  description: REST API for event management with helpdesk functionality and AI-powered chat support
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: info@unitedcallcenters.hu
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        is_helpdesk_agent:
+          type: boolean
+        mfa_enabled:
+          type: boolean
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        title:
+          type: string
+        occurrence:
+          type: string
+          format: date-time
+        description:
+          type: string
+          nullable: true
+
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        agent_id:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum: [open, in_progress, closed]
+        needs_human:
+          type: boolean
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        chat_id:
+          type: integer
+        sender_id:
+          type: integer
+          nullable: true
+        message:
+          type: string
+        sender_type:
+          type: string
+          enum: [user, agent, ai]
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                  user:
+                    $ref: '#/components/schemas/User'
+
+  /auth/verify-mfa:
+    post:
+      tags:
+        - Authentication
+      summary: Verify MFA code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                email:
+                  type: string
+                password:
+                  type: string
+                code:
+                  type: string
+      responses:
+        '200':
+          description: MFA verified successfully
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Password reset link sent
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                password_confirmation:
+                  type: string
+      responses:
+        '200':
+          description: Password reset successfully
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out successfully
+
+  /auth/enable-mfa:
+    post:
+      tags:
+        - Authentication
+      summary: Enable MFA
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: MFA secret and QR code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string
+                  qr_code_url:
+                    type: string
+
+  /auth/confirm-mfa:
+    post:
+      tags:
+        - Authentication
+      summary: Confirm MFA setup
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+      responses:
+        '200':
+          description: MFA enabled successfully
+
+  /events:
+    get:
+      tags:
+        - Events
+      summary: Get all user events
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+
+    post:
+      tags:
+        - Events
+      summary: Create new event
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                occurrence:
+                  type: string
+                  format: date-time
+                description:
+                  type: string
+              required:
+                - title
+                - occurrence
+      responses:
+        '201':
+          description: Event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+
+  /events/{id}:
+    get:
+      tags:
+        - Events
+      summary: Get event by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Event details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+
+    put:
+      tags:
+        - Events
+      summary: Update event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                occurrence:
+                  type: string
+                  format: date-time
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+
+    delete:
+      tags:
+        - Events
+      summary: Delete event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Event deleted
+
+  /chats:
+    get:
+      tags:
+        - Chat
+      summary: Get all user chats
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of chats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+
+    post:
+      tags:
+        - Chat
+      summary: Create new chat
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Chat created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+
+  /chats/{id}/messages:
+    post:
+      tags:
+        - Chat
+      summary: Send message in chat
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+              required:
+                - message
+      responses:
+        '200':
+          description: Message sent and AI response received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_message:
+                    $ref: '#/components/schemas/ChatMessage'
+                  ai_message:
+                    $ref: '#/components/schemas/ChatMessage'
+
+  /helpdesk/chats:
+    get:
+      tags:
+        - Helpdesk
+      summary: Get all chats (agents only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of all chats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+
+  /helpdesk/chats/{id}/assign:
+    post:
+      tags:
+        - Helpdesk
+      summary: Assign chat to current agent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Chat assigned
+
+  /helpdesk/chats/{id}/messages:
+    post:
+      tags:
+        - Helpdesk
+      summary: Send agent message
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      responses:
+        '201':
+          description: Message sent
+
+  /helpdesk/chats/{id}/close:
+    post:
+      tags:
+        - Helpdesk
+      summary: Close chat
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Chat closed

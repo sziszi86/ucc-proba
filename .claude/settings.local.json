@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php:*)",
+      "Bash(composer:*)",
+      "Bash(node --version)",
+      "Bash(npm --version:*)",
+      "Bash(brew list:*)",
+      "Bash(/opt/homebrew/opt/php@8.1/bin/php:*)",
+      "Bash(curl:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(git rm:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
