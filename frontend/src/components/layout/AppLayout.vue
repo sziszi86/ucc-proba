@@ -62,10 +62,17 @@ async function handleLogout() {
       </nav>
 
       <div class="p-6 mt-auto">
-        <div class="bg-[#111111] p-4 border border-slate-800">
-          <div class="flex items-center mb-6">
-            <div class="h-10 w-10 bg-[#fdfbf7] text-[#1a1a1a] flex items-center justify-center font-black text-lg">
-              {{ authStore.user?.name.charAt(0) }}
+        <div class="bg-[#111111] p-4 border border-slate-800 relative overflow-hidden group">
+          <!-- Decorative Manga Background Element -->
+          <div class="absolute -right-4 -bottom-4 text-slate-800/20 text-4xl font-black rotate-12 pointer-events-none uppercase">UCC</div>
+          
+          <div class="flex items-center mb-6 relative z-10">
+            <div class="h-12 w-12 bg-[#fdfbf7] p-0.5 border-2 border-[#c9171e] overflow-hidden">
+              <img 
+                :src="'https://api.dicebear.com/9.x/adventurer/svg?seed=' + (authStore.user?.name || 'User')" 
+                class="w-full h-full object-cover"
+                alt="Avatar"
+              />
             </div>
             <div class="ml-4 overflow-hidden">
               <p class="text-sm font-bold truncate text-[#fdfbf7]">{{ authStore.user?.name }}</p>
@@ -142,10 +149,17 @@ async function handleLogout() {
             </button>
           </div>
           <div class="h-8 w-px bg-slate-200"></div>
-          <div class="flex items-center space-x-3">
-            <p class="text-sm font-bold text-slate-700">{{ authStore.user?.name }}</p>
-            <div class="h-9 w-9 rounded-full bg-slate-200 border-2 border-white shadow-sm flex items-center justify-center font-black text-slate-500 text-xs">
-              {{ authStore.user?.name.charAt(0) }}
+          <div class="flex items-center space-x-3 group cursor-pointer">
+            <div class="text-right">
+              <p class="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">User</p>
+              <p class="text-sm font-bold text-slate-700 leading-none">{{ authStore.user?.name }}</p>
+            </div>
+            <div class="h-10 w-10 bg-white border border-slate-200 overflow-hidden shadow-sm group-hover:border-[#c9171e] transition-colors">
+              <img 
+                :src="'https://api.dicebear.com/9.x/adventurer/svg?seed=' + (authStore.user?.name || 'User')" 
+                class="w-full h-full object-cover"
+                alt="Profile"
+              />
             </div>
           </div>
         </div>

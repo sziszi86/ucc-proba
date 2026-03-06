@@ -71,31 +71,40 @@ function cancelSetup() {
       <p class="mt-2 text-slate-600">Manage your security preferences and profile information.</p>
     </div>
 
-    <div class="max-w-4xl space-y-6">
+    <div class="max-w-4xl space-y-8 animate-in">
       <!-- Profile Card -->
-      <div class="card p-6">
-        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          Profile Information
-        </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-semibold text-slate-500 uppercase tracking-wider">Full Name</label>
-            <p class="mt-1 text-slate-900 font-medium">{{ authStore.user?.name }}</p>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-500 uppercase tracking-wider">Email Address</label>
-            <p class="mt-1 text-slate-900 font-medium">{{ authStore.user?.email }}</p>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-500 uppercase tracking-wider">Account Role</label>
-            <p class="mt-1">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 uppercase">
-                {{ authStore.user?.role || 'User' }}
-              </span>
-            </p>
+      <div class="card p-8 flex flex-col md:flex-row gap-8 items-center md:items-start">
+        <div class="shrink-0 h-32 w-32 bg-slate-50 border-2 border-[#c9171e] p-1 overflow-hidden shadow-lg">
+          <img 
+            :src="'https://api.dicebear.com/9.x/adventurer/svg?seed=' + (authStore.user?.name || 'User')" 
+            class="w-full h-full object-cover"
+            alt="Profile"
+          />
+        </div>
+        <div class="flex-1 text-center md:text-left">
+          <h3 class="text-2xl font-black text-[#1a1a1a] mb-6 flex items-center justify-center md:justify-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-[#c9171e]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Profile Information (プロファイル)
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+            <div>
+              <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Full Name</label>
+              <p class="mt-2 text-[#1a1a1a] font-bold text-lg">{{ authStore.user?.name }}</p>
+            </div>
+            <div>
+              <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Email Address</label>
+              <p class="mt-2 text-[#1a1a1a] font-bold text-lg">{{ authStore.user?.email }}</p>
+            </div>
+            <div>
+              <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Account Role</label>
+              <p class="mt-2">
+                <span class="inline-flex items-center px-3 py-1 text-xs font-black bg-[#1a1a1a] text-white uppercase tracking-widest">
+                  {{ authStore.user?.role || 'User' }}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>

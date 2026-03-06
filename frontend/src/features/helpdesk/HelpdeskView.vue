@@ -295,14 +295,18 @@ function getStatusClass(status: string) {
           <!-- Chat Header -->
           <div class="px-6 py-4 border-b border-slate-100 bg-white flex justify-between items-center">
             <div class="flex items-center">
-              <div class="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-lg">
-                #{{ selectedChat.id }}
+              <div class="h-12 w-12 bg-slate-50 border border-slate-200 overflow-hidden shrink-0">
+                <img 
+                  :src="'https://api.dicebear.com/9.x/adventurer/svg?seed=Support' + selectedChat.id" 
+                  class="w-full h-full object-cover"
+                  alt="Support"
+                />
               </div>
-              <div class="ml-3">
-                <h3 class="font-bold text-slate-900 leading-tight">Conversation with Support</h3>
-                <p class="text-xs text-slate-500 flex items-center">
+              <div class="ml-4">
+                <h3 class="font-bold text-slate-900 leading-tight">Support (サポート)</h3>
+                <p class="text-xs text-slate-500 flex items-center mt-1">
                   <span :class="['inline-block w-2 h-2 rounded-full mr-1.5', selectedChat.status === 'closed' ? 'bg-slate-400' : 'bg-emerald-500 animate-pulse']"></span>
-                  {{ selectedChat.status === 'closed' ? 'Closed' : 'Active' }}
+                  Ticket #{{ selectedChat.id }} • {{ selectedChat.status === 'closed' ? 'Closed' : 'Active' }}
                 </p>
               </div>
             </div>
@@ -331,34 +335,45 @@ function getStatusClass(status: string) {
           <!-- Messages Area -->
           <div 
             ref="chatContainer"
-            class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30"
+            class="flex-1 overflow-y-auto p-6 space-y-8 bg-slate-50/30"
           >
             <div
               v-for="message in selectedChat.messages"
               :key="message.id"
               :class="[
-                'flex flex-col max-w-[85%] sm:max-w-[70%]',
-                message.sender_type === 'user' ? 'ml-auto items-end' : 'items-start'
+                'flex w-full',
+                message.sender_type === 'user' ? 'flex-row-reverse' : 'flex-row'
               ]"
             >
-              <div class="flex items-center mb-1 px-1">
-                <span v-if="message.sender_type !== 'user'" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  {{ message.sender_type === 'agent' ? 'Human Agent' : 'AI Assistant' }}
-                </span>
-                <span class="text-[10px] font-medium text-slate-400 ml-2">{{ formatTime(message.created_at) }}</span>
+              <!-- Avatar -->
+              <div :class="['shrink-0 h-10 w-10 border border-slate-200 bg-white overflow-hidden', message.sender_type === 'user' ? 'ml-4' : 'mr-4']">
+                <img 
+                  :src="'https://api.dicebear.com/9.x/adventurer/svg?seed=' + (message.sender_type === 'user' ? authStore.user?.name : message.sender_type === 'agent' ? 'Agent' : 'AI')" 
+                  class="w-full h-full object-cover"
+                  alt="Avatar"
+                />
               </div>
-              
-              <div
-                :class="[
-                  'px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed',
-                  message.sender_type === 'user' 
-                    ? 'bg-indigo-600 text-white rounded-tr-none' 
-                    : message.sender_type === 'agent'
-                      ? 'bg-emerald-500 text-white rounded-tl-none'
-                      : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none'
-                ]"
-              >
-                {{ message.message }}
+
+              <div :class="['flex flex-col max-w-[85%] sm:max-w-[70%]', message.sender_type === 'user' ? 'items-end' : 'items-start']">
+                <div class="flex items-center mb-1 px-1">
+                  <span v-if="message.sender_type !== 'user'" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    {{ message.sender_type === 'agent' ? 'Human Agent' : 'AI Assistant' }}
+                  </span>
+                  <span class="text-[10px] font-medium text-slate-400 ml-2">{{ formatTime(message.created_at) }}</span>
+                </div>
+                
+                <div
+                  :class="[
+                    'px-4 py-3 shadow-[2px_2px_0px_0px_rgba(26,26,26,0.05)] text-sm leading-relaxed border',
+                    message.sender_type === 'user' 
+                      ? 'bg-[#c9171e] text-white border-[#c9171e]' 
+                      : message.sender_type === 'agent'
+                        ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
+                        : 'bg-white border-slate-200 text-slate-700'
+                  ]"
+                >
+                  {{ message.message }}
+                </div>
               </div>
             </div>
             
