@@ -84,11 +84,22 @@ Import this file to Postman or Swagger UI to explore the API endpoints.
 
 ## Authentication
 
-### Login
+### Default Credentials
+For testing purposes, you can use the following accounts:
+
+**Regular User:**
+- Email: `test@example.com`
+- Password: `password`
+
+**Helpdesk Agent:**
+- Email: `agent@example.com`
+- Password: `password`
+
+### Login API
 ```bash
 POST /api/auth/login
 {
-  "email": "user@example.com",
+  "email": "test@example.com",
   "password": "password"
 }
 ```
@@ -98,11 +109,18 @@ POST /api/auth/login
 POST /api/auth/verify-mfa
 {
   "user_id": 1,
-  "email": "user@example.com",
+  "email": "test@example.com",
   "password": "password",
   "code": "123456"
 }
 ```
+
+## Bonus Features Implemented
+
+- ✅ **MFA (Multi-Factor Authentication):** Google Authenticator support with QR code setup.
+- ✅ **Web Voice Support:** Speech-to-Text (Microphone) and Text-to-Speech (Voice Mode) in the Helpdesk.
+- ✅ **OWASP Top 10 Protections:** Security headers and secure coding practices.
+
 
 ## Environment Variables
 

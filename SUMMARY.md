@@ -323,11 +323,23 @@ Body:
 
 ---
 
-## Bónusz pontok implementálva
+## Belépési adatok teszteléshez 🔑
 
-✅ **MFA is present** - Google Authenticator integráció teljes implementációval
-✅ **Protection from various cyberattacks** - OWASP Top 10 védelmek
-✅ **The system is also available on a voice basis** - Nincs implementálva (opcionális bónusz)
+**Ügyfél (Regular User):**
+- Email: `test@example.com`
+- Jelszó: `password`
+
+**Ügyfélszolgálati munkatárs (Agent):**
+- Email: `agent@example.com`
+- Jelszó: `password`
+
+---
+
+## Bónusz feladatok implementálva 🏆
+
+✅ **MFA (Multi-Factor Authentication)** - Google Authenticator integráció teljes QR kódos beállítással.
+✅ **Protection from various cyberattacks** - OWASP Top 10 védelmek.
+✅ **The system is also available on a voice basis** - **Megvalósítva!** Beszédfelismerés (Mikrofon) és Szövegfelolvasás (Voice Mode) a Helpdesk felületen.
 
 ---
 
