@@ -291,3 +291,8 @@ npm run test
 - **Presentation**: `PRESENTATION.md` - Detailed project documentation
 - **API Docs**: `backend/storage/api-docs/api-docs.yaml` - OpenAPI specification
 
+## Demo Video
+
+Watch the project demonstration and overview:
+- **YouTube**: https://youtu.be/Ml0goCglM7k?si=_pyQeL8mUqd1ouSS
+

@@ -832,6 +832,15 @@ A rendszer készen áll további fejlesztésekre, skálázásra és production k
 **Frontend:** `frontend/src/`
 **Backend:** `backend/app/`
 
+---
+
+## Demo Video
+
+A projekt bemutatása és működése videón:
+- **YouTube**: https://youtu.be/Ml0goCglM7k?si=_pyQeL8mUqd1ouSS
+
+---
+
 **Készítette:** [Név]
 **Dátum:** 2026-03-06
 **Projekt:** UCC Event Management & Helpdesk System
