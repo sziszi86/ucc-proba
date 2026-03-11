@@ -2,6 +2,9 @@
 import { ref, onMounted, nextTick, watch } from 'vue'
 import { chatService, type Chat, type ChatMessage } from '@/services/chatService'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const chats = ref<Chat[]>([])
 const selectedChat = ref<Chat | null>(null)
